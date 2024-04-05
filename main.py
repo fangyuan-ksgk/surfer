@@ -1,7 +1,21 @@
 import asyncio
 from IPython import display
 from playwright.async_api import async_playwright
-from utils import *
+from src import utils, perception
+from src import graph
+
+
+import argparse
+
+# Create the parser
+parser = argparse.ArgumentParser(description='Process mode value.')
+
+# Add an argument
+parser.add_argument('-m', type=int, choices=[0, 1], required=True, help='Mode value (0 or 1)')
+
+# Parse the argument
+args = parser.parse_args()
+
 
 async def main():
     browser = await async_playwright().start()
@@ -37,7 +51,8 @@ async def main():
                 break
         return final_answer
 
-    question = input("Please enter your question: ")
+    # question = input("Please enter your question: ") # Command Line Input
+    question = perception.listen()
     answer = await call_agent(question, page)
     print(f"Final answer: {answer}")
 
