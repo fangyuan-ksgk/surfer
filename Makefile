@@ -8,5 +8,11 @@ install:
 
 	pip install -r requirements.txt
 
+	pre-commit install
+	pre-commit autoupdate
+
 run:
 	python -m main
+
+run-pre-commit:
+	pre-commit run --all-files
