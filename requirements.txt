@@ -1,5 +1,10 @@
-lanchainhub
-langgraph 
-langsmith 
-langchain_openai
-playwright
+langchainhub==0.1.15
+langgraph==0.0.32
+langsmith==0.1.40
+langchain_openai==0.1.1
+playwright==1.42.0
+ipython==8.23.0
+pyaudio==0.2.14
+numpy==1.26.4
+lightning-whisper-mlx==0.0.10
+diart==0.9.0
