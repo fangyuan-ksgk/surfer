@@ -1,7 +1,7 @@
 from diart import SpeakerDiarization
-from diart.sources import MicrophoneAudioSource
 from diart.inference import StreamingInference
 from diart.sinks import RTTMWriter
+from diart.sources import MicrophoneAudioSource
 
 pipeline = SpeakerDiarization()
 mic = MicrophoneAudioSource()

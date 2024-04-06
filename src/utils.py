@@ -14,8 +14,8 @@ _getpass("LANGCHAIN_API_KEY")
 _getpass("OPENAI_API_KEY")
 
 
-
 from typing import List, Optional, TypedDict
+
 from langchain_core.messages import BaseMessage, SystemMessage
 from playwright.async_api import Page
 
@@ -45,6 +45,7 @@ class AgentState(TypedDict):
     scratchpad: List[BaseMessage]
     observation: str  # The most recent response from a tool
 
+
 import asyncio
 import platform
 
@@ -73,9 +74,7 @@ async def type_text(state: AgentState):
     page = state["page"]
     type_args = state["prediction"]["args"]
     if type_args is None or len(type_args) != 2:
-        return (
-            f"Failed to type in element from bounding box labeled as number {type_args}"
-        )
+        return f"Failed to type in element from bounding box labeled as number {type_args}"
     bbox_id = type_args[0]
     bbox_id = int(bbox_id)
     bbox = state["bboxes"][bbox_id]
@@ -102,9 +101,7 @@ async def scroll(state: AgentState):
     if target.upper() == "WINDOW":
         # Not sure the best value for this:
         scroll_amount = 500
-        scroll_direction = (
-            -scroll_amount if direction.lower() == "up" else scroll_amount
-        )
+        scroll_direction = -scroll_amount if direction.lower() == "up" else scroll_amount
         await page.evaluate(f"window.scrollBy(0, {scroll_direction})")
     else:
         # Scrolling within a specific element
@@ -112,9 +109,7 @@ async def scroll(state: AgentState):
         target_id = int(target)
         bbox = state["bboxes"][target_id]
         x, y = bbox["x"], bbox["y"]
-        scroll_direction = (
-            -scroll_amount if direction.lower() == "up" else scroll_amount
-        )
+        scroll_direction = -scroll_amount if direction.lower() == "up" else scroll_amount
         await page.mouse.move(x, y)
         await page.mouse.wheel(0, scroll_direction)
 
@@ -137,6 +132,7 @@ async def to_google(state: AgentState):
     page = state["page"]
     await page.goto("https://www.google.com/")
     return "Navigated to google.com."
+
 
 import asyncio
 import base64
@@ -167,6 +163,7 @@ async def mark_page(page):
         "img": base64.b64encode(screenshot).decode(),
         "bboxes": bboxes,
     }
+
 
 from langchain import hub
 from langchain_core.output_parsers import StrOutputParser
@@ -206,9 +203,7 @@ def parse(text: str) -> dict:
         action, action_input = split_output
     action = action.strip()
     if action_input is not None:
-        action_input = [
-            inp.strip().strip("[]") for inp in action_input.strip().split(";")
-        ]
+        action_input = [inp.strip().strip("[]") for inp in action_input.strip().split(";")]
     return {"action": action, "args": action_input}
 
 
@@ -217,9 +212,7 @@ def parse(text: str) -> dict:
 prompt = hub.pull("wfh/web-voyager")
 
 llm = ChatOpenAI(model="gpt-4-vision-preview", max_tokens=4096)
-agent = annotate | RunnablePassthrough.assign(
-    prediction=format_descriptions | prompt | llm | StrOutputParser() | parse
-)
+agent = annotate | RunnablePassthrough.assign(prediction=format_descriptions | prompt | llm | StrOutputParser() | parse)
 
 
 import re
@@ -289,5 +282,3 @@ def select_tool(state: AgentState):
 graph_builder.add_conditional_edges("agent", select_tool)
 
 graph = graph_builder.compile()
-
-

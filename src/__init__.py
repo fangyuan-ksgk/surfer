@@ -1,2 +1,2 @@
-from .utils import *
 from .perception import *
+from .utils import *

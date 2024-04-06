@@ -1,17 +1,16 @@
+import argparse
 import asyncio
+
 from IPython import display
 from playwright.async_api import async_playwright
-from src import utils, perception
-from src import graph
 
-
-import argparse
+from src import graph, perception, utils
 
 # Create the parser
-parser = argparse.ArgumentParser(description='Process mode value.')
+parser = argparse.ArgumentParser(description="Process mode value.")
 
 # Add an argument
-parser.add_argument('-m', type=int, choices=[0, 1], required=True, help='Mode value (0 or 1)')
+parser.add_argument("-m", type=int, choices=[0, 1], required=True, help="Mode value (0 or 1)")
 
 # Parse the argument
 args = parser.parse_args()
@@ -57,6 +56,7 @@ async def main():
     print(f"Final answer: {answer}")
 
     await browser.close()
+
 
 if __name__ == "__main__":
     asyncio.run(main())
