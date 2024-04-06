@@ -1,0 +1,20 @@
+[tool.black]
+line-length = 120
+target-version = ['py37', 'py38', 'py39', 'py310']
+include = '\.pyi?$'
+exclude = '''
+/(
+    .git
+  | .venv
+  | __pycache__
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 120
+skip = [".venv", "__pycache__", "build", "dist"]
+known_first_party = ["my_project", "another_module"]
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]

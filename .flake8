@@ -1,0 +1,39 @@
+[flake8]
+# Basic Flake8 configuration:
+
+# Max line length increased from the default 79 to 120
+max-line-length = 120
+
+# Exclude some directories from linting
+exclude =
+    .git,
+    __pycache__,
+    build,
+    dist,
+    venv,
+    .venv
+
+# Ignore some warnings/errors:
+# E203: whitespace before ':' (conflicts with black formatter)
+# W503: line break before binary operator (contrary to PEP 8 recommendation)
+ignore =
+    E203,
+    W503
+
+# Select specific errors and warnings to enable
+select =
+    E,
+    F,
+    W,
+    C
+
+# Set the complexity of the McCabe script. The default is 10.
+max-complexity = 10
+
+# Optionally enable plugins. For example, if you're using type hints, you might want to lint them with flake8-type-checking
+# requires = flake8-type-checking
+
+# Configure flake8-type-checking if it is enabled
+# [flake8-type-checking]
+# enable-strict-type-checking = True
+# enable-use-type-annotations = True
