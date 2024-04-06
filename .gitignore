@@ -134,3 +134,7 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# Additional
+src/mlx_models/*
+src/record/*
