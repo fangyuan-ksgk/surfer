@@ -2,6 +2,10 @@
 import os
 from getpass import getpass
 
+import dotenv
+
+dotenv.load_dotenv()
+
 
 def _getpass(env_var: str):
     if not os.environ.get(env_var):
@@ -12,6 +16,7 @@ os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_PROJECT"] = "Web-Voyager"
 _getpass("LANGCHAIN_API_KEY")
 _getpass("OPENAI_API_KEY")
+_getpass("GLADIA_API_KEY")
 
 
 from typing import List, Optional, TypedDict
