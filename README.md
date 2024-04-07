@@ -1,6 +1,6 @@
 # 🌊 Surfer
 
-Voice Interface on Web Browsing
+Voice Interface on Web Browsing | Collaborator: @AaronGrainer
 
 Input what you would like to do with your browser, you'd be surprised ;>
 
