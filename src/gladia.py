@@ -5,9 +5,9 @@ import os
 
 import pyaudio
 import websockets
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
-load_dotenv()
+# load_dotenv()
 
 GLADIA_API_KEY = os.environ["GLADIA_API_KEY"]
 
@@ -86,5 +86,6 @@ async def listen():
         receive_task = asyncio.create_task(receive_transcription(socket))
         # await asyncio.gather(send_task, receive_task)
         final_transcription = await receive_task
+        print("Final Transcription: ", final_transcription)
         send_task.cancel()
         return final_transcription

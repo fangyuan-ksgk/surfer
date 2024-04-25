@@ -2,9 +2,9 @@
 import os
 from getpass import getpass
 
-import dotenv
+# import dotenv
 
-dotenv.load_dotenv()
+# dotenv.load_dotenv()
 
 
 def _getpass(env_var: str):
