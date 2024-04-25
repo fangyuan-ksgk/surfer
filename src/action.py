@@ -170,16 +170,19 @@ def chat_with_llama(user_message):
       function_args = json.loads(tool_call.function.arguments)
 
       if function_name == "run_command_tool":
+        print("Command Tool")
         command = function_args["command"]
         command_output = run_command_tool(command)
         return command_output
       
       if function_name == "write_file_tool":
+        print("File Writer Tool")
         filename = function_args["filename"]
         content = function_args["content"]
         write_file_tool(filename, content)
 
       if function_name == "read_file_tool":
+        print("File Reader Tool")
         filename = function_args["filename"]
         file_content = read_file_tool(filename)
         return file_content
