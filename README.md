@@ -5,9 +5,11 @@ Voice Interface on Web Browsing | Collaborator: @AaronGrainer
 Input what you would like to do with your browser, you'd be surprised ;>
 
 WebVoyaer in-place. Terminal Command-line Input Accepted to automate web-search.
-TBD:
 
-- Whisper Voice input instead
+TBD:
+- Chain-up commands for self-debugging
+- Chain-up commands for web-browsing and self-assignment
+
 
 ## Setup & Installation
 
