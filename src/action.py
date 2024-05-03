@@ -126,6 +126,8 @@ claude_tools = [
 # Terminal Access | Run Command and observe output
 def run_command_tool(command):
   result = subprocess.run([command], shell=True, capture_output=True, text=True)
+  if result.stderr:
+     return result.stderr
   return result.stdout
 
 # Write File | Write File content into system
@@ -139,10 +141,34 @@ def read_file_tool(filename):
         return file.read()
     
 SYSTEM_PROMPT = """You are a helpful assistant, helping to navigate the world of operating system. You can run commands in terminal, create and read files, which includes write python file and execute it. Browing through codebase and record your findings is also possible."""
-    
+  
+# def chat_with_llama_no_tool(user_message):
+#   """ 
+#   llama3-70b groq enabled version ; without tools
+#   """
+#   print(f"\n{'='*50}\nUser message: {user_message}\n{'='*50}")
+
+#   messages = [
+#       {"role": "system", "content": SYSTEM_PROMPT},
+#       {"role": "user", "content": user_message}
+#   ]
+
+#   MODEL_NAME = "llama3-70b-8192"
+
+#   response = groq_client.chat.completions.create(
+#       model=MODEL_NAME,
+#       messages=messages,
+#       tools = [],
+#       max_tokens=4096,
+#   )
+
+#   response_message = response.choices[0].message
+#   return response_message.content
+
+  
 def chat_with_llama(user_message):
   """ 
-  llama-70b groq enabled version
+  llama3-70b groq enabled version ; with tools
   """
   print(f"\n{'='*50}\nUser message: {user_message}\n{'='*50}")
 
