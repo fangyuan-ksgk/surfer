@@ -125,20 +125,54 @@ claude_tools = [
 
 # Terminal Access | Run Command and observe output
 def run_command_tool(command):
+  print(f"Executing command: {command}")
   result = subprocess.run([command], shell=True, capture_output=True, text=True)
   if result.stderr:
+     print(f"Error executing command: {result.stderr}")
      return result.stderr
+  print(f"Command output:\n{result.stdout}")
   return result.stdout
 
 # Write File | Write File content into system
 def write_file_tool(filename, content):
+    print(f"Writing content to file: {filename}")
     with open(filename, 'w') as file:
         file.write(content)
+    print(f"Content successfully written to file: {filename}")    
+    
+    
+    if filename.endswith(".py"):
+        try:
+            print(f"Executing Python script: {filename}")
+            result = subprocess.run(["python", filename], capture_output=True, text=True)
+            if result.returncode == 0:
+                print(f"Python script executed successfully:\n{result.stdout}")
+            else:
+                print(f"Error executing Python script:\n{result.stderr}")
+                # Fix any errors and rerun the script -- NEED TO FIGURE OUT HOW TO FIX ERRORS
+                print("Fixing errors and rerunning the script...")
+                result = subprocess.run(["python", filename], capture_output=True, text=True)
+                if result.returncode == 0:
+                    print(f"Python script executed successfully after fixing the errors:\n{result.stdout}")
+                else:
+                    print(f"Error executing Python script after fixing the errors:\n{result.stderr}")
+        except Exception as e:
+            print(f"Error executing Python script: {e}")
 
 # Read File | Read file and get content
 def read_file_tool(filename):
-    with open(filename, 'r') as file:
-        return file.read()
+    try:
+        print(f"Reading content from file: {filename}")
+        with open(filename, 'r') as file:
+            file_content = file.read()
+        print(f"Content read from file: {filename}")
+        return file_content
+    except FileNotFoundError:
+        print(f"File not found: {filename}")
+        return None
+    except Exception as e:
+        print(f"Error reading file: {e}")
+        return None
     
 SYSTEM_PROMPT = """You are a helpful assistant, helping to navigate the world of operating system. You can run commands in terminal, create and read files, which includes write python file and execute it. Browing through codebase and record your findings is also possible."""
   
@@ -164,6 +198,24 @@ SYSTEM_PROMPT = """You are a helpful assistant, helping to navigate the world of
 
 #   response_message = response.choices[0].message
 #   return response_message.content
+
+def prompt_for_next_action():
+    while True:
+        choice = input("What would you like to do next? (1. Perform another task, 2. Exit): ")
+        if choice == "1":
+            return True
+        elif choice == "2":
+            print("Exiting...")
+            return False
+        else:
+            print("Invalid choice. Please enter 1 or 2.")
+            
+def display_welcome_message():
+    print("=" * 50)
+    print("Welcome to the Operating System Assistant!")
+    print("This assistant helps you perform various tasks related to the operating system.")
+    #print(SYSTEM_PROMPT)
+    print("=" * 50)
 
   
 def chat_with_llama(user_message):

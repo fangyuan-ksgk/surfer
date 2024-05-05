@@ -1,7 +1,7 @@
 
 install:
-	conda create -n surfer python=3.11 -y
-	conda activate surfer
+	# conda create -n surfer python=3.11 -y
+	# conda activate surfer
 
 	brew update
 	brew upgrade
