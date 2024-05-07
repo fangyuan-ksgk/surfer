@@ -70,6 +70,23 @@ tools = [
         "required": ["filename"],
       },
     },
+  },
+  {
+     "type": "function",
+     "function": {
+        "name": "search_web_tool",
+        "description": "Searches the web for a given query and returns the top results.",
+        "parameters": {
+           "type": "object",
+           "properties": {
+              "query": {
+                 "type": "string",
+                 "description": "The query to search for.",
+              }
+           },
+           "required": ["query"]
+        }
+     }
   }
 ]
 
@@ -121,6 +138,20 @@ claude_tools = [
             "required": ["filename"]
         }
     },
+    {
+        "name": "search_web_tool",
+        "description": "Searches the web for a given query and returns the top results.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "description": "The query to search for."
+                }
+            },
+            "required": ["query"]
+        }
+    }
 ]
 
 # Terminal Access | Run Command and observe output
@@ -137,6 +168,22 @@ def write_file_tool(filename, content):
 def read_file_tool(filename):
     with open(filename, 'r') as file:
         return file.read()
+    
+# Web Search Tool
+def search_web_tool(query):
+    
+    url = "https://google.serper.dev/search"
+
+    payload = json.dumps({
+      "q": query
+    })
+    headers = {
+      'X-API-KEY': os.environ['SERP_API_KEY'],
+      'Content-Type': 'application/json'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+    return json.loads(response.text)['organic']
     
 SYSTEM_PROMPT = """You are a helpful assistant, helping to navigate the world of operating system. You can run commands in terminal, create and read files, which includes write python file and execute it. Browing through codebase and record your findings is also possible."""
     
@@ -187,7 +234,13 @@ def chat_with_llama(user_message):
         file_content = read_file_tool(filename)
         return file_content
       
-      if function_name not in ["run_command_tool", "write_file_tool", "read_file_tool"]:
+      if function_name == "search_web_tool":
+        print("Web Search Tool")
+        query = function_args["query"]
+        search_results = search_web_tool(query)
+        return search_results
+      
+      if function_name not in ["run_command_tool", "write_file_tool", "read_file_tool", "search_web_tool"]:
         raise Exception(f"Unknown tool {function_name}")
   else:
     print(f"(No tool call in model's response) {response_message}")
@@ -236,6 +289,10 @@ def chat_with_claude(user_message):
             filename = tool_input.filename
             file_content = read_file_tool(filename)
             return file_content
+        elif tool_name == "search_web_tool":
+            query = tool_input.query
+            search_results = search_web_tool(query)
+            return search_results
         else:
             raise Exception(f"Unknown tool {tool_name}")
             

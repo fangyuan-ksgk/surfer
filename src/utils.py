@@ -217,6 +217,9 @@ def parse(text: str) -> dict:
 prompt = hub.pull("wfh/web-voyager")
 
 llm = ChatOpenAI(model="gpt-4-vision-preview", max_tokens=4096)
+
+
+
 agent = annotate | RunnablePassthrough.assign(prediction=format_descriptions | prompt | llm | StrOutputParser() | parse)
 
 
