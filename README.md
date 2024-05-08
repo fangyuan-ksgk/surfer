@@ -1,6 +1,6 @@
 # 🌊 Surfer
 
-Voice Interface on Web Browsing | Collaborator: @AaronGrainer
+Voice Interface on Web Browsing [Automating Entertainment | Work] | Collaborator: @AaronGrainer
 
 Input what you would like to do with your browser, you'd be surprised ;>
 
@@ -31,10 +31,11 @@ GLADIA_API_KEY="xxx-xxx"
 
 ```bash
 make install
+pip install -r requirements.txt
 ```
 
-## Running it
+## Running it 
 
 ```bash
-make run
+python surf.py
 ```
