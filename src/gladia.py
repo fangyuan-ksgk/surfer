@@ -42,7 +42,7 @@ async def send_audio(socket):
     stream = P.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=FRAMES_PER_BUFFER)
 
     # print("Please ask me a question:")
-    print("How can I help:")
+    print("Provide your instruction: ")
     while socket.open:
         try:
             data = stream.read(FRAMES_PER_BUFFER)
