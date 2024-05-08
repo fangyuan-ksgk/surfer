@@ -1,10 +1,24 @@
 # Optional: add tracing to visualize the agent trajectories
+import asyncio
+import base64
 import os
+import platform
+import re
 from getpass import getpass
+from typing import List, Optional, TypedDict
 
-# import dotenv
+import dotenv
+from langchain import hub
+from langchain_core.messages import BaseMessage, SystemMessage
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.runnables import RunnableLambda, RunnablePassthrough
+from langchain_core.runnables import chain as chain_decorator
+from langchain_openai import ChatOpenAI
+from langgraph.graph import END, StateGraph
+from playwright.async_api import Page
 
-# dotenv.load_dotenv()
+dotenv.load_dotenv()
 
 
 def _getpass(env_var: str):
@@ -17,12 +31,6 @@ os.environ["LANGCHAIN_PROJECT"] = "Web-Voyager"
 _getpass("LANGCHAIN_API_KEY")
 _getpass("OPENAI_API_KEY")
 _getpass("GLADIA_API_KEY")
-
-
-from typing import List, Optional, TypedDict
-
-from langchain_core.messages import BaseMessage, SystemMessage
-from playwright.async_api import Page
 
 
 class BBox(TypedDict):
@@ -49,10 +57,6 @@ class AgentState(TypedDict):
     # A system message (or messages) containing the intermediate steps
     scratchpad: List[BaseMessage]
     observation: str  # The most recent response from a tool
-
-
-import asyncio
-import platform
 
 
 async def click(state: AgentState):
@@ -139,11 +143,6 @@ async def to_google(state: AgentState):
     return "Navigated to google.com."
 
 
-import asyncio
-import base64
-
-from langchain_core.runnables import chain as chain_decorator
-
 # Some javascript we will run on each step
 # to take a screenshot of the page, select the
 # elements to annotate, and add bounding boxes
@@ -168,13 +167,6 @@ async def mark_page(page):
         "img": base64.b64encode(screenshot).decode(),
         "bboxes": bboxes,
     }
-
-
-from langchain import hub
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.runnables import RunnablePassthrough
-from langchain_openai import ChatOpenAI
 
 
 async def annotate(state):
@@ -219,11 +211,7 @@ prompt = hub.pull("wfh/web-voyager")
 llm = ChatOpenAI(model="gpt-4-vision-preview", max_tokens=4096)
 
 
-
 agent = annotate | RunnablePassthrough.assign(prediction=format_descriptions | prompt | llm | StrOutputParser() | parse)
-
-
-import re
 
 
 def update_scratchpad(state: AgentState):
@@ -241,9 +229,6 @@ def update_scratchpad(state: AgentState):
 
     return {**state, "scratchpad": [SystemMessage(content=txt)]}
 
-
-from langchain_core.runnables import RunnableLambda
-from langgraph.graph import END, StateGraph
 
 graph_builder = StateGraph(AgentState)
 
