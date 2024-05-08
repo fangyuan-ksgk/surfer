@@ -61,6 +61,7 @@ async def main():
                 action_input = pred.get("args")
                 print(f"{len(steps) + 1}. {action}: {action_input}")
                 steps.append(f"{len(steps) + 1}. {action}: {action_input}")
+                event["agent"]["input"] = "Search for meaning of life" # Check if the injection works | It does NOT really work here
                 if "ANSWER" in action:
                     final_answer = action_input[0]
                     break
