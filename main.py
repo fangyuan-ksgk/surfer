@@ -31,9 +31,14 @@ async def main():
         browser = await async_playwright().start()
         # We will set headless=False so we can watch the agent navigate the web.
         browser = await browser.chromium.launch(headless=False, args=None)
-        page = await browser.new_page()
-        _ = await page.goto("https://www.google.com")
 
+        page = await browser.new_page()
+        _ = await page.goto("https://www.google.com") # This is where we decide the starting point of the agent
+
+        # 1. Use 'Stop' as the detectable stopping word for the agent, so that it halts the execution.
+        # 2. New instruction could leads to a new web-page | need to get deeper into the state & scrathpad
+
+        # Main Entry Point function: Question parsed Once and no more intpu" It does seems that internal state should be manipulatable
         async def call_agent(question: str, page, max_steps: int = 150):
             event_stream = graph.astream(
                 {

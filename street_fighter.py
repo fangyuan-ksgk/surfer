@@ -1,0 +1,1 @@
+print("Ryu: Hadouken!")

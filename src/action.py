@@ -213,7 +213,7 @@ SYSTEM_PROMPT = """You are a helpful assistant, helping to navigate the world of
 #   return response_message.content
 
   
-def chat_with_llama(user_message):
+def chat_with_llama(user_message, use_tool=True):
   """ 
   llama3-70b groq enabled version ; with tools
   """
@@ -226,10 +226,12 @@ def chat_with_llama(user_message):
 
   MODEL_NAME = "llama3-70b-8192"
 
+  use_tools = tools if use_tool else []
+
   response = groq_client.chat.completions.create(
       model=MODEL_NAME,
       messages=messages,
-      tools=tools,
+      tools=use_tools,
       tool_choice="auto",
       max_tokens=4096,
   )
@@ -265,13 +267,13 @@ def chat_with_llama(user_message):
         query = function_args["query"]
         search_results = search_web_tool(query)
         return search_results
+    
       
       if function_name not in ["run_command_tool", "write_file_tool", "read_file_tool", "search_web_tool"]:
         raise Exception(f"Unknown tool {function_name}")
   else:
     print(f"(No tool call in model's response) {response_message}")
-    return []
-  
+    return response_message.content  
   
 
 def chat_with_claude(user_message):
