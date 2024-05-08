@@ -201,10 +201,12 @@ def chat_with_llama(user_message):
 
     MODEL_NAME = "llama3-70b-8192"
 
+    use_tools = tools if use_tool else []
+
     response = groq_client.chat.completions.create(
         model=MODEL_NAME,
         messages=messages,
-        tools=tools,
+        tools=use_tools,
         tool_choice="auto",
         max_tokens=4096,
     )
@@ -245,8 +247,8 @@ def chat_with_llama(user_message):
                 raise Exception(f"Unknown tool {function_name}")
     else:
         print(f"(No tool call in model's response) {response_message}")
-        return []
-
+        return response_message.content
+  
 
 def chat_with_claude(user_message):
     print(f"\n{'='*50}\nUser Message: {user_message}\n{'='*50}")

@@ -6,25 +6,10 @@ from playwright.async_api import async_playwright
 
 from src import gladia, graph, perception, utils
 
-# Create the parser
-parser = argparse.ArgumentParser(description="Process mode value.")
-
-# Add an argument
-parser.add_argument("-m", "--mode", type=int, choices=[0, 1], required=True, help="Mode value (0 or 1)")
-parser.add_argument(
-    "-t",
-    "--type",
-    type=str,
-    required=False,
-    help="Input type (text or voice)",
-    default="text",
-    choices=["text", "voice"],
-)
-parser.add_argument("-c", "--continuous", action="store_true", help="Enable continuous mode")
-
-# Parse the argument
-args = parser.parse_args()
-
+auto_config = {
+    "auto_steps": 4,
+    "max_iterations": 99
+}
 
 async def main():
     while True:
@@ -33,13 +18,15 @@ async def main():
         browser = await browser.chromium.launch(headless=False, args=None)
 
         page = await browser.new_page()
-        _ = await page.goto("https://www.google.com") # This is where we decide the starting point of the agent
+        global url 
+        url = "https://www.google.com"
+        _ = await page.goto(url) # Starting Point
 
         # 1. Use 'Stop' as the detectable stopping word for the agent, so that it halts the execution.
         # 2. New instruction could leads to a new web-page | need to get deeper into the state & scrathpad
 
         # Main Entry Point function: Question parsed Once and no more intpu" It does seems that internal state should be manipulatable
-        async def call_agent(question: str, page, max_steps: int = 150):
+        async def call_agent(question: str, page, max_steps: int = auto_config["auto_steps"]):
             event_stream = graph.astream(
                 {
                     "page": page,
@@ -50,7 +37,6 @@ async def main():
                     "recursion_limit": max_steps,
                 },
             )
-            final_answer = None
             steps = []
             async for event in event_stream:
                 # We'll display an event stream here
@@ -62,24 +48,26 @@ async def main():
                 print(f"{len(steps) + 1}. {action}: {action_input}")
                 steps.append(f"{len(steps) + 1}. {action}: {action_input}")
                 event["agent"]["input"] = "Search for meaning of life" # Check if the injection works | It does NOT really work here
-                if "ANSWER" in action:
-                    final_answer = action_input[0]
-                    break
-            return final_answer
+                url = page.url
+                
+        # Limit the number of rounds Surfer Agent could surf 
+        for i in range(auto_config["max_iterations"]):
+            # question = input("Please enter your instruction: ")  # Command Line Input
+            tmp_question = await gladia.listen()
+            
+            if 'proceed' not in tmp_question: # Dummy Input, not very instructive, keep original instruction
+                question = tmp_question
 
-        if args.type == "text":
-            question = input("Please enter your question: ")  # Command Line Input
-        elif args.type == "voice":
-            # question = perception.listen()
-            question = await gladia.listen()
+            if 'exit' in question or 'Exit' in question: # Exit the Agent
+                print("See you next time ;>")
+                return
 
-        answer = await call_agent(question, page)
-        print(f"Final answer: {answer}")
+            try:
+                url = await call_agent(question, page)
+            except:
+                continue
 
         await browser.close()
-
-        if not args.continuous:
-            break
 
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@ import wave
 
 import numpy as np
 import pyaudio
-from lightning_whisper_mlx import LightningWhisperMLX
+# from lightning_whisper_mlx import LightningWhisperMLX
 
 # Set up the audio parameters
 FORMAT = pyaudio.paFloat32
@@ -15,7 +15,7 @@ RATE = 16000
 CHUNK = 2048  # Increased chunk size
 
 # Initialize the Whisper model
-whisper = LightningWhisperMLX(model="distil-medium.en", batch_size=12, quant=None)
+# whisper = LightningWhisperMLX(model="distil-medium.en", batch_size=12, quant=None)
 
 audio_path = "./src/record/tmp.wav"
 
@@ -60,7 +60,8 @@ def transcribe(whisper, audio_path=audio_path):
     return text
 
 
-def listen(whisper=whisper, audio_path=audio_path):
+def listen(whisper=None, audio_path=audio_path):
+    pass
     record_audio(audio_path)
     return transcribe(whisper, audio_path)
 
