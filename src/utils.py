@@ -152,6 +152,10 @@ with open("./src/mark_page.js") as f:
 
 @chain_decorator
 async def mark_page(page):
+    """ 
+    This function marks the browser page and returns Image & BBoxes
+    Useful -- what type is "page" here?
+    """
     await page.evaluate(mark_page_script)
     for _ in range(10):
         try:
@@ -208,7 +212,7 @@ def parse(text: str) -> dict:
 # this image prompt template
 prompt = hub.pull("wfh/web-voyager")
 
-llm = ChatOpenAI(model="gpt-4-vision-preview", max_tokens=4096)
+llm = ChatOpenAI(model="gpt-4o", max_tokens=4096)
 
 
 agent = annotate | RunnablePassthrough.assign(prediction=format_descriptions | prompt | llm | StrOutputParser() | parse)

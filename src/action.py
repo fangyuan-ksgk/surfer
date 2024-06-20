@@ -191,7 +191,7 @@ SYSTEM_PROMPT = """You are a helpful assistant, helping to navigate the world of
 #   return response_message.content
 
 
-def chat_with_llama(user_message):
+def chat_with_llama(user_message, use_tool: bool = True):
     """
     llama3-70b groq enabled version ; with tools
     """

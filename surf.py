@@ -52,7 +52,7 @@ async def main():
                 
         # Limit the number of rounds Surfer Agent could surf 
         for i in range(auto_config["max_iterations"]):
-            # question = input("Please enter your instruction: ")  # Command Line Input
+            # tmp_question = input("Please enter your instruction: ")  # Command Line Input
             tmp_question = await gladia.listen()
             
             if 'proceed' not in tmp_question: # Dummy Input, not very instructive, keep original instruction
