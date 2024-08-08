@@ -250,6 +250,7 @@ tools = {
     "Wait": wait,
     "GoBack": go_back,
     "Google": to_google,
+    # "TakeNote": take_note,
 }
 
 
