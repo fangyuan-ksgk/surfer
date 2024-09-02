@@ -1,0 +1,5 @@
+# url: "https://www.google.com"
+url: "https://www.linkedin.com/search/results/content/?fromMember=%5B%22ACoAAAALIBwBxx3rg9HdgFfkXYFERK16LrKmIig%22%5D&heroEntityKey=urn%3Ali%3Afsd_profile%3AACoAAAALIBwBxx3rg9HdgFfkXYFERK16LrKmIig&keywords=matt%20johnson&origin=CLUSTER_EXPANSION&position=0&searchId=71c0d6c8-b8e2-435b-a2cd-804240f4bf33&sid=c7g&sortBy=%22date_posted%22](https://www.linkedin.com/search/results/content/?fromMember=%5B%22ACoAAAALIBwBxx3rg9HdgFfkXYFERK16LrKmIig%22%5D&heroEntityKey=urn%3Ali%3Afsd_profile%3AACoAAAALIBwBxx3rg9HdgFfkXYFERK16LrKmIig&keywords=matt%20johnson&origin=CLUSTER_EXPANSION&position=0&searchId=71c0d6c8-b8e2-435b-a2cd-804240f4bf33&sid=c7g&sortBy=%22date_posted%22)"
+auto_steps: 10
+max_iterations: 99
+prompt_file: "prompts/linkedin_scraper.txt"

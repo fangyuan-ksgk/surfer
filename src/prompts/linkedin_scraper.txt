@@ -1,0 +1,3 @@
+[Login] Login to LinkedIn, user: {linkedin_username} password: {linkedin_password}
+[Goal] Collect information on Matt's 5 recent linkedin posts and their statistics
+[Instruction] After login, do not click any where, scroll down and collect the information
