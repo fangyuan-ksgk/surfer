@@ -73,7 +73,7 @@ TBD:
    - https://platform.openai.com/
    - https://app.gladia.io/
 
-2. Create a `.env` file and populate:
+2. Create a `.env` file from the `.env.example` file and populate:
 
 ```.env
 LANGCHAIN_API_KEY="ls__xxx"
@@ -84,12 +84,13 @@ GLADIA_API_KEY="xxx-xxx"
 3. Create environment and install neccesary packages
 
 ```bash
+make env
+conda activate surfer
 make install
-pip install -r requirements.txt
 ```
 
 ## Running it 
 
 ```bash
-python surf.py
+make run
 ```
