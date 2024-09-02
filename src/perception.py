@@ -1,11 +1,9 @@
-import os
 import select
 import sys
-import time
 import wave
 
-import numpy as np
 import pyaudio
+
 # from lightning_whisper_mlx import LightningWhisperMLX
 
 # Set up the audio parameters
@@ -24,7 +22,13 @@ audio_path = "./src/record/tmp.wav"
 # One press some 'button' and the recording started
 def record_audio(file_path=audio_path):
     p = pyaudio.PyAudio()
-    stream = p.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=1024)
+    stream = p.open(
+        format=pyaudio.paInt16,
+        channels=1,
+        rate=16000,
+        input=True,
+        frames_per_buffer=1024,
+    )
     frames = []
 
     print("Recording...")

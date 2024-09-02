@@ -40,7 +40,9 @@ with wave.open("output.wav", "wb") as wf:
         # Save the audio data as a temporary file
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_audio:
             temp_audio_path = temp_audio.name
-            audio_data = (audio_data * 32767).astype(np.int16)  # Scale and convert to int16
+            audio_data = (audio_data * 32767).astype(
+                np.int16
+            )  # Scale and convert to int16
             # Use wave module to write audio data to a temporary file
             with wave.open(temp_audio_path, "wb") as wf:
                 wf.setnchannels(CHANNELS)

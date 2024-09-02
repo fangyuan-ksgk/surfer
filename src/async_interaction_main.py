@@ -9,8 +9,9 @@ import anyio
 import dotenv
 from openai import OpenAI
 
-from .utils.logging import logger
 from src import gladia
+
+from .utils.logging import logger
 
 dotenv.load_dotenv()
 
@@ -67,8 +68,15 @@ def run_async(func):
 
 def run_async_script(python_file_name: str, question: str):
     # This function will be run in a separate thread to handle the subprocess
-    process = subprocess.Popen(["python", f"{python_file_name}.py", question], stdout=subprocess.PIPE, text=True)
-    output, _ = process.communicate()  # Wait for the process to complete and get the stdout
+    process = subprocess.Popen(
+        ["python", f"{python_file_name}.py", question],
+        stdout=subprocess.PIPE,
+        text=True,
+    )
+    (
+        output,
+        _,
+    ) = process.communicate()  # Wait for the process to complete and get the stdout
     logger.info(f"Agent: {output}")
     MESSAGES.append({"role": "assistant", "content": output})
 
@@ -131,7 +139,9 @@ async def async_user_interaction(conversation_type: str = "text"):
             if function_name == "browse_web":
                 call_async_script_in_thread(function_name, function_args["question"])
                 logger.info(f"Agent: {function_args['wait_message']}")
-                MESSAGES.append({"role": "assistant", "content": function_args["wait_message"]})
+                MESSAGES.append(
+                    {"role": "assistant", "content": function_args["wait_message"]}
+                )
             else:
                 raise Exception(f"Unknown tool {function_name}")
         else:

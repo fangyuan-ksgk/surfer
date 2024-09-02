@@ -4,6 +4,7 @@ import platform
 import re
 from typing import Any, TypedDict
 
+import dotenv
 from langchain import hub
 from langchain_core.messages import BaseMessage, SystemMessage
 from langchain_core.output_parsers import StrOutputParser
@@ -12,7 +13,6 @@ from langchain_core.runnables import chain as chain_decorator
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, StateGraph
 from playwright.async_api import Page
-import dotenv
 
 dotenv.load_dotenv()
 

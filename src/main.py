@@ -1,11 +1,11 @@
 import asyncio
 
-from .orchestrator import build_web_voyager_graph
 from playwright.async_api import Browser, Page, async_playwright
 
+from . import gladia
+from .orchestrator import build_web_voyager_graph
 from .utils.logging import logger
 from .utils.utils import load_config, read_file
-from . import gladia
 
 config = load_config()
 graph = build_web_voyager_graph()

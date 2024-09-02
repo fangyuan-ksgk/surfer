@@ -1,6 +1,5 @@
 import json
 import os
-import re
 import subprocess
 
 import requests
@@ -96,7 +95,12 @@ claude_tools = [
         "description": "Executes a terminal command and returns the standard output.",
         "input_schema": {
             "type": "object",
-            "properties": {"command": {"type": "string", "description": "The command to execute in the terminal."}},
+            "properties": {
+                "command": {
+                    "type": "string",
+                    "description": "The command to execute in the terminal.",
+                }
+            },
             "required": ["command"],
         },
     },
@@ -106,8 +110,14 @@ claude_tools = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "filename": {"type": "string", "description": "The name of the file to write to."},
-                "content": {"type": "string", "description": "The content to write into the file."},
+                "filename": {
+                    "type": "string",
+                    "description": "The name of the file to write to.",
+                },
+                "content": {
+                    "type": "string",
+                    "description": "The content to write into the file.",
+                },
             },
             "required": ["filename", "content"],
         },
@@ -117,7 +127,12 @@ claude_tools = [
         "description": "Reads content from a specified file and returns it.",
         "input_schema": {
             "type": "object",
-            "properties": {"filename": {"type": "string", "description": "The name of the file to read from."}},
+            "properties": {
+                "filename": {
+                    "type": "string",
+                    "description": "The name of the file to read from.",
+                }
+            },
             "required": ["filename"],
         },
     },
@@ -126,7 +141,9 @@ claude_tools = [
         "description": "Searches the web for a given query and returns the top results.",
         "input_schema": {
             "type": "object",
-            "properties": {"query": {"type": "string", "description": "The query to search for."}},
+            "properties": {
+                "query": {"type": "string", "description": "The query to search for."}
+            },
             "required": ["query"],
         },
     },
@@ -155,11 +172,13 @@ def read_file_tool(filename):
 
 # Web Search Tool
 def search_web_tool(query):
-
     url = "https://google.serper.dev/search"
 
     payload = json.dumps({"q": query})
-    headers = {"X-API-KEY": os.environ["SERP_API_KEY"], "Content-Type": "application/json"}
+    headers = {
+        "X-API-KEY": os.environ["SERP_API_KEY"],
+        "Content-Type": "application/json",
+    }
 
     response = requests.request("POST", url, headers=headers, data=payload)
     return json.loads(response.text)["organic"]
@@ -197,7 +216,10 @@ def chat_with_llama(user_message, use_tool: bool = True):
     """
     print(f"\n{'='*50}\nUser message: {user_message}\n{'='*50}")
 
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": user_message}]
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": user_message},
+    ]
 
     MODEL_NAME = "llama3-70b-8192"
 
@@ -243,12 +265,17 @@ def chat_with_llama(user_message, use_tool: bool = True):
                 search_results = search_web_tool(query)
                 return search_results
 
-            if function_name not in ["run_command_tool", "write_file_tool", "read_file_tool", "search_web_tool"]:
+            if function_name not in [
+                "run_command_tool",
+                "write_file_tool",
+                "read_file_tool",
+                "search_web_tool",
+            ]:
                 raise Exception(f"Unknown tool {function_name}")
     else:
         print(f"(No tool call in model's response) {response_message}")
         return response_message.content
-  
+
 
 def chat_with_claude(user_message):
     print(f"\n{'='*50}\nUser Message: {user_message}\n{'='*50}")
@@ -267,7 +294,7 @@ def chat_with_claude(user_message):
         tools=claude_tools,
     )
 
-    print(f"\nInitial Response:")
+    print("\nInitial Response:")
     print(f"Stop Reason: {message.stop_reason}")
     print(f"Content: {message.content}")
 
