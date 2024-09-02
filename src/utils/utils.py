@@ -7,7 +7,7 @@ import yaml
 dotenv.load_dotenv()
 
 
-def load_config(file_path: str = "config.yaml") -> dict[str, Any]:
+def load_config(file_path: str = "src/config.yaml") -> dict[str, Any]:
     # Check that the following environment variables are set
     for env_var in [
         "LANGCHAIN_API_KEY",

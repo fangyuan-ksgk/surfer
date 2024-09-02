@@ -1,20 +1,16 @@
-import argparse
 import asyncio
 import json
 import os
 import subprocess
 import threading
 from functools import wraps
-from multiprocessing import Process
 
 import anyio
 import dotenv
-from IPython import display
 from openai import OpenAI
-from playwright.async_api import async_playwright
 
-from config import logger
-from src import gladia, graph, perception, utils
+from .utils.logging import logger
+from src import gladia
 
 dotenv.load_dotenv()
 

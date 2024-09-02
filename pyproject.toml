@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "temus_linguaforge_surfer"
+name = "surfer"
 version = "0.0.1"
 description = "Autonomous web browsing agent"
 authors = ["Fangyuan <fangyuan.yu@temus.com>", "Aaron <aaron.lim@temus.com"]

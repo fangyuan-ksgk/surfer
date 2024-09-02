@@ -12,6 +12,9 @@ from langchain_core.runnables import chain as chain_decorator
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, StateGraph
 from playwright.async_api import Page
+import dotenv
+
+dotenv.load_dotenv()
 
 
 class BBox(TypedDict):

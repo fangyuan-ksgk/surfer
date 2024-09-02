@@ -1,9 +1,11 @@
 import asyncio
 
-from orchestrator import build_web_voyager_graph  # type: ignore
+from .orchestrator import build_web_voyager_graph
 from playwright.async_api import Browser, Page, async_playwright
 
-from src.utils.utils import load_config, read_file
+from .utils.logging import logger
+from .utils.utils import load_config, read_file
+from . import gladia
 
 config = load_config()
 graph = build_web_voyager_graph()
@@ -22,6 +24,7 @@ async def call_agent(
             "recursion_limit": max_steps,
         },
     )
+    final_answer = None
     steps: list[str] = []
     async for event in event_stream:
         if "agent" not in event:
@@ -29,31 +32,40 @@ async def call_agent(
         pred = event.get("agent", {}).get("prediction") or {}
         action = pred.get("action")
         action_input = pred.get("args")
-        print(f"{len(steps) + 1}. {action}: {action_input}")
+        logger.info(f"{len(steps) + 1}. {action}: {action_input}")
         steps.append(f"{len(steps) + 1}. {action}: {action_input}")
-        event["agent"]["input"] = "Search for meaning of life"
-    return page.url
+        if "ANSWER" in action:
+            final_answer = action_input[0]
+            break
+    return final_answer
 
 
 async def main() -> None:
     async with async_playwright() as p:
+        input_type = config["input_type"]
+        assert input_type in ["text", "audio"]
+
         browser: Browser = await p.chromium.launch(headless=False)
 
         page: Page = await browser.new_page()
         url = config["url"]
         await page.goto(url)
 
-        for _ in range(config["max_iterations"]):
+        if input_type == "text":
             question = read_file(config["prompt_file"])
-
-            if "exit" in question.lower():
-                print("See you next time ;>")
-                return
-
             try:
-                url = await call_agent(question, page)
+                final_answer = await call_agent(question, page)
+                logger.info(f"final_answer: {final_answer}")
             except Exception:
-                continue
+                pass
+        else:
+            for _ in range(config["max_iterations"]):
+                question = await gladia.listen()
+                try:
+                    final_answer = await call_agent(question, page)
+                    logger.info(f"final_answer: {final_answer}")
+                except Exception:
+                    continue
 
         await browser.close()
 

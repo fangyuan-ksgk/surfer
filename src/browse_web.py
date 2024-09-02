@@ -3,8 +3,10 @@ import asyncio
 
 from playwright.async_api import async_playwright
 
-from src import graph
+from .orchestrator import build_web_voyager_graph
 
+
+graph = build_web_voyager_graph()
 
 async def browse_web(question: str, max_steps: int = 150):
     browser = await async_playwright().start()

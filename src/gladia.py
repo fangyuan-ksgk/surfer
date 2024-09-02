@@ -6,9 +6,11 @@ import os
 import pyaudio
 import websockets
 
-# from dotenv import load_dotenv
+from .utils.logging import logger
 
-# load_dotenv()
+from dotenv import load_dotenv
+
+load_dotenv()
 
 GLADIA_API_KEY = os.environ["GLADIA_API_KEY"]
 
@@ -34,7 +36,7 @@ P = pyaudio.PyAudio()
 
 
 async def send_audio(socket):
-    print("Connected!")
+    logger.info("Connected!")
     config = {"x-gladia-key": GLADIA_API_KEY, "language_behaviour": LANGUAGE_BEHAVIOUR, "reinject_context": "true"}
     if LANGUAGE_BEHAVIOUR == "manual":
         config["language"] = LANGUAGE
@@ -43,7 +45,7 @@ async def send_audio(socket):
     stream = P.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=FRAMES_PER_BUFFER)
 
     # print("Please ask me a question:")
-    print("Provide your instruction: ")
+    logger.info("Provide your instruction: ")
     while socket.open:
         try:
             data = stream.read(FRAMES_PER_BUFFER)
@@ -51,7 +53,7 @@ async def send_audio(socket):
             json_data = json.dumps({"frames": str(data)})
             await socket.send(json_data)
         except websockets.exceptions.ConnectionClosedError as e:
-            print(e)
+            logger.exception(f"Exception: {e}")
             assert e.code == 4008
             break
         except Exception as e:
@@ -67,19 +69,19 @@ async def receive_transcription(socket):
 
         if utterance:
             if ERROR_KEY in utterance:
-                print(f"{utterance[ERROR_KEY]}")
+                logger.error(f"{utterance[ERROR_KEY]}")
                 break
             else:
                 if TYPE_KEY in utterance:
-                    print(f"{utterance[TYPE_KEY]}: ({utterance[LANGUAGE_KEY]}) {utterance[TRANSCRIPTION_KEY]}")
+                    logger.info(f"{utterance[TYPE_KEY]}: ({utterance[LANGUAGE_KEY]}) {utterance[TRANSCRIPTION_KEY]}")
                     if utterance[TYPE_KEY] == "final":
-                        print(
+                        logger.info(
                             f"Final transcription received: "
                             f"({utterance[LANGUAGE_KEY]}) {utterance[TRANSCRIPTION_KEY]}"
                         )
                         return utterance[TRANSCRIPTION_KEY]
         else:
-            print("Empty, waiting for next utterance...")
+            logger.info("Empty, waiting for next utterance...")
 
 
 async def listen():
@@ -88,6 +90,6 @@ async def listen():
         receive_task = asyncio.create_task(receive_transcription(socket))
         # await asyncio.gather(send_task, receive_task)
         final_transcription = await receive_task
-        print("Final Transcription: ", final_transcription)
+        logger.info("Final Transcription: ", final_transcription)
         send_task.cancel()
         return final_transcription

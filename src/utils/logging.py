@@ -3,6 +3,8 @@ import logging.config
 import sys
 from pathlib import Path
 
+from rich.logging import RichHandler
+
 from .directories import LOGS_DIR
 
 # Loggers configuration
@@ -13,10 +15,6 @@ logging_config = {
         "minimal": {"format": "%(message)s"},
         "detailed": {
             "format": "%(levelname)s %(asctime)s [%(filename)s:%(funcName)s:%(lineno)d] %(message)s",
-        },
-        "json": {
-            "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
-            "format": "%(timestamp)s %(level)s %(name)s %(message)s",
         },
     },
     "handlers": {
@@ -32,15 +30,6 @@ logging_config = {
             "maxBytes": 10485760,  # 1 MB
             "backupCount": 10,
             "formatter": "detailed",
-            "level": logging.INFO,
-            "encoding": "utf-8",
-        },
-        "json_file": {
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": Path(LOGS_DIR, "log.json"),
-            "maxBytes": 10485760,  # 1 MB
-            "backupCount": 10,
-            "formatter": "json",
             "level": logging.INFO,
             "encoding": "utf-8",
         },
@@ -71,3 +60,4 @@ logging_config = {
 logging.config.dictConfig(logging_config)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("root")
+logger.handlers[0] = RichHandler(markup=True, log_time_format="%Y-%m-%d %H.%M.%S.%f")
