@@ -3,7 +3,7 @@ import asyncio
 
 from playwright.async_api import async_playwright
 
-from .orchestrator import build_web_voyager_graph
+from .langchain_orchestrator import build_web_voyager_graph
 
 graph = build_web_voyager_graph()
 
