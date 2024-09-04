@@ -1,19 +1,21 @@
-from .modal import AgentState, Prediction
-import platform
 import asyncio
-from playwright.async_api import Page
-import base64
+import platform
 
+from ..modal import AgentState
 
 
 async def click(state: AgentState) -> str:
-    """_summary_
+    """
+    Perform a click action on a specified bounding box.
 
     Args:
-        state (AgentState): _description_
+        state (AgentState): The current state of the agent, containing page, prediction, and bboxes.
 
     Returns:
-        str: _description_
+        str: A message indicating the result of the click action.
+
+    This function extracts the click target from the prediction, finds the corresponding
+    bounding box, and performs a mouse click at the center of that box.
     """
     page = state.page
     prediction = state.prediction
@@ -31,6 +33,19 @@ async def click(state: AgentState) -> str:
 
 
 async def type_text(state: AgentState) -> str:
+    """
+    Type text into a specified element and submit.
+
+    Args:
+        state (AgentState): The current state of the agent, containing page, prediction, and bboxes.
+
+    Returns:
+        str: A message indicating the result of the typing action.
+
+    This function extracts the target element and text content from the prediction,
+    clicks on the specified element, clears any existing text, types the new content,
+    and submits it by pressing Enter.
+    """
     page = state.page
     prediction = state.prediction
     type_args = prediction.args
@@ -53,6 +68,18 @@ async def type_text(state: AgentState) -> str:
 
 
 async def scroll(state: AgentState) -> str:
+    """
+    Scroll the page or a specific element.
+
+    Args:
+        state (AgentState): The current state of the agent, containing page, prediction, and bboxes.
+
+    Returns:
+        str: A message indicating the result of the scrolling action.
+
+    This function handles scrolling either the entire window or a specific element on the page.
+    It interprets the scroll direction and target from the prediction args and performs the appropriate action.
+    """
     page = state.page
     prediction = state.prediction
     scroll_args = prediction.args
@@ -82,6 +109,15 @@ async def scroll(state: AgentState) -> str:
 
 
 async def wait(state: AgentState) -> str:
+    """
+    Pause execution for a fixed amount of time.
+
+    Args:
+        state (AgentState): The current state of the agent (unused in this function).
+
+    Returns:
+        str: A message indicating the duration of the wait.
+    """
     _ = state
     sleep_time = 5
     await asyncio.sleep(sleep_time)
@@ -89,35 +125,30 @@ async def wait(state: AgentState) -> str:
 
 
 async def go_back(state: AgentState) -> str:
+    """
+    Navigate back to the previous page in the browser history.
+
+    Args:
+        state (AgentState): The current state of the agent, containing the page object.
+
+    Returns:
+        str: A message indicating the navigation action and the new URL.
+    """
     page = state.page
     await page.go_back()
     return f"Navigated back a page to {page.url}."
 
 
 async def to_google(state: AgentState) -> str:
+    """
+    Navigate to the Google homepage.
+
+    Args:
+        state (AgentState): The current state of the agent, containing the page object.
+
+    Returns:
+        str: A message confirming the navigation to Google.
+    """
     page = state.page
     await page.goto("https://www.google.com/")
     return "Navigated to google.com."
-
-
-async def mark_page(page: Page) -> str:
-    with open("./src/mark_page.js") as f:
-        mark_page_script = f.read()
-    
-    await page.evaluate(mark_page_script)
-    for _ in range(10):
-        try:
-            bboxes = await page.evaluate("markPage()")
-            break
-        except Exception:
-            # May be loading...
-            await asyncio.sleep(3)
-    screenshot = await page.screenshot()
-    # Ensure the bboxes don't follow us around
-    await page.evaluate("unmarkPage()")
-    return {
-        "img": base64.b64encode(screenshot).decode(),
-        "bboxes": bboxes,
-    }
-
-

@@ -1,24 +1,14 @@
 import asyncio
-from dataclasses import dataclass
-from typing import Optional
 
 import typer
 from playwright.async_api import Page, async_playwright
 
-from . import gladia
-from .utils.logging import logger
-from .utils.utils import read_file
+from src import gladia
+from src.schemas.config import MainConfig
+from src.utils.logging import logger
+from src.utils.utils import read_file
 
 app = typer.Typer()
-
-
-@dataclass
-class MainConfig:
-    input_type: str
-    prompt_file: str
-    start_url: str
-    max_steps: int
-    max_iterations: int
 
 
 async def call_agent(question: str, page: Page, max_steps: int):
@@ -51,26 +41,11 @@ async def start(config: MainConfig):
 
 @app.command()
 def main(
-    input_type: str = typer.Option(
-        "text", 
-        help="Input type must be either `text` or `audio`"
-    ),
-    prompt_file: Optional[str] = typer.Option(
-        None, 
-        help="Path to the prompt file (only when input_type=text)"
-    ),
-    start_url: str = typer.Option(
-        "https://google.com", 
-        help="URL to start the browser at"
-    ),
-    max_steps: int = typer.Option(
-        10, 
-        help="Maximum number of steps to run / recursion limit"
-    ),
-    max_iterations: int = typer.Option(
-        1, 
-        help="Maximum number of iterations to run"
-    ),
+    input_type: str = typer.Option("text", help="Input type: 'text' or 'audio'"),
+    prompt_file: str | None = typer.Option(None, help="Prompt file path"),
+    start_url: str = typer.Option("https://google.com", help="Start URL"),
+    max_steps: int = typer.Option(10, help="Max steps"),
+    max_iterations: int = typer.Option(1, help="Max iterations"),
 ) -> None:
     assert input_type in ["text", "audio"]
 
