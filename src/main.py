@@ -1,5 +1,6 @@
 import asyncio
 from dataclasses import dataclass
+from typing import Optional
 
 import typer
 from playwright.async_api import Page, async_playwright
@@ -51,19 +52,26 @@ async def start(config: MainConfig):
 @app.command()
 def main(
     input_type: str = typer.Option(
-        "text", help="Input type must be either `text` or `audio`"
+        "text", 
+        help="Input type must be either `text` or `audio`"
     ),
-    prompt_file: str = typer.Option(
-        None, help="Path to the prompt file (only when input_type=text)"
+    prompt_file: Optional[str] = typer.Option(
+        None, 
+        help="Path to the prompt file (only when input_type=text)"
     ),
     start_url: str = typer.Option(
-        "https://google.com", help="URL to start the browser at"
+        "https://google.com", 
+        help="URL to start the browser at"
     ),
     max_steps: int = typer.Option(
-        10, help="Maximum number of steps to run / recursion limit"
+        10, 
+        help="Maximum number of steps to run / recursion limit"
     ),
-    max_iterations: int = typer.Option(1, help="Maximum number of iterations to run"),
-):
+    max_iterations: int = typer.Option(
+        1, 
+        help="Maximum number of iterations to run"
+    ),
+) -> None:
     assert input_type in ["text", "audio"]
 
     config = MainConfig(
