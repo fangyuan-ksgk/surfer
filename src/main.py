@@ -1,10 +1,13 @@
 import asyncio
 
 import typer
+from openai import OpenAI
 from playwright.async_api import Page, async_playwright
 
 from src import gladia
-from src.schemas.config import MainConfig
+from src.orchestrator.orchestrator import Orchestrator
+from src.orchestrator.prompt import WEB_BROWSING
+from src.schemas.config import MainConfig, OrchestratorConfig
 from src.utils.logging import logger
 from src.utils.utils import read_file
 
@@ -39,6 +42,17 @@ async def start(config: MainConfig):
         await browser.close()
 
 
+async def start_test(config: MainConfig):
+    client = OpenAI()
+
+    config = OrchestratorConfig(
+        system_prompt=WEB_BROWSING,
+        # llm="openai/gpt-4o",
+        llm="anthropic/claude-3-5-sonnet-20240620",
+    )
+    orchestrator = Orchestrator(config)
+
+
 @app.command()
 def main(
     input_type: str = typer.Option("text", help="Input type: 'text' or 'audio'"),
@@ -57,7 +71,8 @@ def main(
         max_iterations=max_iterations,
     )
 
-    asyncio.run(start(config))
+    # asyncio.run(start(config))
+    asyncio.run(start_test(config))
 
 
 if __name__ == "__main__":

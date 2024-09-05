@@ -1,7 +1,6 @@
-from typing import TypedDict
-
 from playwright.async_api import Page
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+from typing_extensions import TypedDict
 
 
 class BBox(TypedDict):
@@ -27,10 +26,12 @@ class BaseMessage(BaseModel):
 
 
 class AgentState(BaseModel):
-    page: Page
-    input: str
-    img: str
-    bboxes: list[BBox]
-    prediction: Prediction
-    scratchpad: list[BaseMessage]
-    observation: str
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    page: Page | None = None
+    input: str | None = None
+    img: str | None = None
+    bboxes: list[BBox] | None = None
+    prediction: Prediction | None = None
+    scratchpad: list[BaseMessage] | None = None
+    observation: str | None = None
