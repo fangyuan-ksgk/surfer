@@ -16,7 +16,12 @@ class OpenAILLM:
         )
         self.config = config
 
-    def generate(self, messages: list[dict], stream: bool = False, tools: list[dict] | None = None):
+    def generate(
+        self,
+        messages: list[dict],
+        stream: bool = False,
+        tools: list[dict] | None = None,
+    ):
         return self.client.chat.completions.create(
             model=self.config.model_name,
             messages=messages,
@@ -24,5 +29,5 @@ class OpenAILLM:
             temperature=self.config.temperature,
             frequency_penalty=self.config.frequency_penalty,
             stream=stream,
-            tools=tools
+            tools=tools,
         )

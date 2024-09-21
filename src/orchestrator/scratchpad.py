@@ -1,6 +1,6 @@
 import re
 
-from src.schemas.modal import AgentState
+from src.schemas.models import AgentState
 from src.schemas.prompt import Message
 
 
@@ -27,4 +27,4 @@ def update_scratchpad(state: AgentState) -> AgentState:
         txt = "Previous action observations:\n"
         step = 1
     txt += f"\n{step}. {state.observation}"
-    return AgentState(**{**state.dict(), "scratchpad": [Message(content=txt)]})
+    return AgentState(**{**state.model_dump(), "scratchpad": [Message(content=txt)]})

@@ -1,56 +1,76 @@
 import asyncio
 
+import dotenv
 import typer
-from openai import OpenAI
-from playwright.async_api import Page, async_playwright
+from playwright.async_api import Page
 
-from src import gladia
 from src.orchestrator.orchestrator import Orchestrator
 from src.orchestrator.prompt import WEB_BROWSING
+from src.orchestrator.tools.web import (
+    click,
+    go_back,
+    scroll,
+    to_google,
+    type_text,
+    wait,
+)
+from src.orchestrator.utils import convert_tools_to_openai_format
 from src.schemas.config import MainConfig, OrchestratorConfig
+from src.schemas.models import AgentState
 from src.utils.logging import logger
 from src.utils.utils import read_file
 
 app = typer.Typer()
 
+dotenv.load_dotenv()
+
 
 async def call_agent(question: str, page: Page, max_steps: int):
-    pass
+    agent_state = AgentState(
+        page=page,
+        input=question,
+        scratchpad=[],
+    )
+    config = OrchestratorConfig(
+        system_prompt=WEB_BROWSING,
+        llm="openai/gpt-4o",
+        agent_state=agent_state,
+        tools=[click, type_text, scroll, wait, go_back, to_google],
+        max_steps=max_steps,
+    )
+    orchestrator = Orchestrator(config)
+    orchestrator.run()
+
+
+async def handle_text_input(config: MainConfig, page: Page):
+    if config.prompt_file:
+        question = read_file(config.prompt_file)
+    else:
+        # question = typer.prompt("Please enter your question")
+        question = "What is the weather in San Francisco?"
+
+    try:
+        final_answer = await call_agent(question, page, config.max_steps)
+        logger.info(f"final_answer: {final_answer}")
+    except Exception:
+        pass
 
 
 async def start(config: MainConfig):
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=False)
-        page = await browser.new_page()
-        await page.goto(config.start_url)
+    # async with async_playwright() as p:
+    #     browser = await p.chromium.launch(headless=False)
+    #     page = await browser.new_page()
+    #     await page.goto(config.start_url)
 
-        if config.input_type == "text":
-            if config.prompt_file:
-                question = read_file(config.prompt_file)
-            else:
-                question = typer.prompt("Please enter your question")
+    #     if config.input_type == "text":
+    #         await handle_text_input(config, page)
+    #     else:
+    #         raise ValueError(f"Unsupported input type: {config.input_type}")
 
-            try:
-                final_answer = await call_agent(question, page, config.max_steps)
-                logger.info(f"final_answer: {final_answer}")
-            except Exception:
-                pass
-        else:
-            for _ in range(config.max_iterations):
-                question = await gladia.listen()
+    #     await browser.close()
 
-        await browser.close()
-
-
-async def start_test(config: MainConfig):
-    client = OpenAI()
-
-    config = OrchestratorConfig(
-        system_prompt=WEB_BROWSING,
-        # llm="openai/gpt-4o",
-        llm="anthropic/claude-3-5-sonnet-20240620",
-    )
-    orchestrator = Orchestrator(config)
+    tools = convert_tools_to_openai_format([click, type_text, scroll, wait, go_back, to_google])
+    print(tools)
 
 
 @app.command()
@@ -71,8 +91,7 @@ def main(
         max_iterations=max_iterations,
     )
 
-    # asyncio.run(start(config))
-    asyncio.run(start_test(config))
+    asyncio.run(start(config))
 
 
 if __name__ == "__main__":

@@ -23,8 +23,8 @@ clean:
 
 ## Lint
 lint:
-	ruff check src --fix
-	ruff format src
+	ruff check src --fix --unsafe-fixes && ruff format src
+	ruff check examples --fix --unsafe-fixes && ruff format examples
 
 ## Run the application
 run:

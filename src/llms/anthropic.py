@@ -14,12 +14,17 @@ class AnthropicLLM:
         )
         self.config = config
 
-    def generate(self, messages: list[dict], stream: bool = False, tools: list[dict] | None = None):
+    def generate(
+        self,
+        messages: list[dict],
+        stream: bool = False,
+        tools: list[dict] | None = None,
+    ):
         return self.client.messages.create(
             model=self.config.model_name,
             messages=messages,
             max_tokens=self.config.max_tokens,
             temperature=self.config.temperature,
             stream=stream,
-            tools=tools
+            tools=tools,
         )

@@ -3,7 +3,7 @@ import base64
 
 from playwright.async_api import Page
 
-from src.schemas.modal import AgentState
+from src.schemas.models import AgentState
 
 
 async def mark_page(page: Page) -> str:

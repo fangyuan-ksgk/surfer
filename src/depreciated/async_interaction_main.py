@@ -10,7 +10,6 @@ import dotenv
 from openai import OpenAI
 
 from src.depreciated import gladia
-
 from src.utils.logging import logger
 
 dotenv.load_dotenv()
