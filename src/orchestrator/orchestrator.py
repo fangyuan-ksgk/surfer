@@ -1,8 +1,8 @@
 from src.llms.anthropic import AnthropicLLM
 from src.llms.openai import OpenAILLM
+from src.orchestrator.utils import convert_tools_to_openai_format
 from src.schemas.config import OrchestratorConfig
 from src.schemas.llm import LLMConfig, LLMType
-from src.orchestrator.utils import convert_tools_to_openai_format
 
 
 class Orchestrator:
@@ -28,9 +28,6 @@ class Orchestrator:
             )
         else:
             raise ValueError(f"Invalid LLM type: {llm_type}")
-
-    def _build(self):
-        pass
 
     def run(self):
         pass

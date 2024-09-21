@@ -105,7 +105,9 @@ def convert_tools_to_openai_format(tools: list[Callable]) -> list[dict[str, Any]
         parameters = parameters[1:]
 
         docstring = inspect.getdoc(func)
-        description, params_doc = docstring.split("Args:", 1) if "Args:" in docstring else (docstring, "")
+        description, params_doc = (
+            docstring.split("Args:", 1) if "Args:" in docstring else (docstring, "")
+        )
 
         tool = {
             "type": "function",
@@ -117,12 +119,17 @@ def convert_tools_to_openai_format(tools: list[Callable]) -> list[dict[str, Any]
         }
 
         for param in parameters:
-            param_doc = next((line.strip() for line in params_doc.split("\n") if param.name in line), "")
-            param_description = param_doc.split(":", 1)[1].strip() if ":" in param_doc else ""
-            
+            param_doc = next(
+                (line.strip() for line in params_doc.split("\n") if param.name in line),
+                "",
+            )
+            param_description = (
+                param_doc.split(":", 1)[1].strip() if ":" in param_doc else ""
+            )
+
             tool["function"]["parameters"]["properties"][param.name] = {
                 "type": "string",
-                "description": param_description
+                "description": param_description,
             }
             if param.default == inspect.Parameter.empty:
                 tool["function"]["parameters"]["required"].append(param.name)

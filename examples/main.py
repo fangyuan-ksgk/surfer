@@ -2,7 +2,7 @@ import asyncio
 
 import dotenv
 import typer
-from playwright.async_api import Page
+from playwright.async_api import Page, async_playwright
 
 from src.orchestrator.orchestrator import Orchestrator
 from src.orchestrator.prompt import WEB_BROWSING
@@ -14,7 +14,6 @@ from src.orchestrator.tools.web import (
     type_text,
     wait,
 )
-from src.orchestrator.utils import convert_tools_to_openai_format
 from src.schemas.config import MainConfig, OrchestratorConfig
 from src.schemas.models import AgentState
 from src.utils.logging import logger
@@ -57,20 +56,17 @@ async def handle_text_input(config: MainConfig, page: Page):
 
 
 async def start(config: MainConfig):
-    # async with async_playwright() as p:
-    #     browser = await p.chromium.launch(headless=False)
-    #     page = await browser.new_page()
-    #     await page.goto(config.start_url)
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=False)
+        page = await browser.new_page()
+        await page.goto(config.start_url)
 
-    #     if config.input_type == "text":
-    #         await handle_text_input(config, page)
-    #     else:
-    #         raise ValueError(f"Unsupported input type: {config.input_type}")
+        if config.input_type == "text":
+            await handle_text_input(config, page)
+        else:
+            raise ValueError(f"Unsupported input type: {config.input_type}")
 
-    #     await browser.close()
-
-    tools = convert_tools_to_openai_format([click, type_text, scroll, wait, go_back, to_google])
-    print(tools)
+        await browser.close()
 
 
 @app.command()
