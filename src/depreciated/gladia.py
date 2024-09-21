@@ -7,7 +7,7 @@ import pyaudio
 import websockets
 from dotenv import load_dotenv
 
-from .utils.logging import logger
+from src.utils.logging import logger
 
 load_dotenv()
 

@@ -9,9 +9,9 @@ import anyio
 import dotenv
 from openai import OpenAI
 
-from src import gladia
+from src.depreciated import gladia
 
-from .utils.logging import logger
+from src.utils.logging import logger
 
 dotenv.load_dotenv()
 

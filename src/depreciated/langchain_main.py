@@ -2,10 +2,10 @@ import asyncio
 
 from playwright.async_api import Browser, Page, async_playwright
 
-from . import gladia
-from .langchain_orchestrator import build_web_voyager_graph
-from .utils.logging import logger
-from .utils.utils import load_config, read_file
+from src.depreciated import gladia
+from src.depreciated.langchain_orchestrator import build_web_voyager_graph
+from src.utils.logging import logger
+from src.utils.utils import load_config, read_file
 
 config = load_config()
 graph = build_web_voyager_graph()

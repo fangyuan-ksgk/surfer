@@ -3,7 +3,7 @@ import logging
 
 from playwright.async_api import async_playwright
 
-from src import graph
+from src.depreciated.langchain_orchestrator import build_web_voyager_graph
 
 logger = logging.getLogger("Surfer Agent")
 logger.setLevel(logging.INFO)
@@ -11,6 +11,8 @@ hander = logging.StreamHandler()
 formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 hander.setFormatter(formatter)
 logger.addHandler(hander)
+
+graph = build_web_voyager_graph()
 
 
 async def main():

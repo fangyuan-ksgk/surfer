@@ -1,7 +1,7 @@
 import asyncio
 import platform
 
-from ..modal import AgentState
+from src.schemas.modal import AgentState
 
 
 async def click(state: AgentState) -> str:
