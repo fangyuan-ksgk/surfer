@@ -21,7 +21,7 @@ async def mark_page(page: Page) -> str:
         dict: A dictionary containing the base64-encoded screenshot and bounding box information.
     """
     # Read the JavaScript file containing the marking script
-    with open("./src/mark_page.js") as f:
+    with open("./src/orchestrator/mark_page.js") as f:
         mark_page_script = f.read()
 
     # Attempt to execute the marking script
@@ -41,22 +41,18 @@ async def mark_page(page: Page) -> str:
     }
 
 
-async def annotate(state: AgentState) -> str:
+async def annotate(state: AgentState) -> AgentState:
     """
     Annotate the page with bounding boxes and take a screenshot.
-
-    This function reads a JavaScript file to mark elements on the page,
-    attempts to execute the marking script, takes a screenshot,
-    and then removes the markings.
 
     Args:
         state (AgentState): The current state of the agent, containing the page object.
 
     Returns:
-        dict: A dictionary containing the base64-encoded screenshot and bounding box information.
+        AgentState: An updated AgentState object with the screenshot and bounding box information.
     """
-    marked_page = await mark_page.with_retry().ainvoke(state.page)
-    return {**state, **marked_page}
+    marked_page = await mark_page(state.page)
+    return AgentState(**{**state.__dict__, **marked_page})
 
 
 def format_descriptions(state: AgentState) -> str:

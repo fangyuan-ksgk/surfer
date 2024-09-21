@@ -1,8 +1,9 @@
 import inspect
+import json
 from collections.abc import Callable
 from typing import Any
 
-from src.schemas.constants import END
+from src.orchestrator.constants import END
 from src.schemas.models import AgentState
 
 
@@ -36,31 +37,36 @@ def parse(text: str) -> dict[str, Any]:
     """
     Parse the LLM output to extract the action and arguments.
 
-    This function takes the LLM output, checks if it ends with "Action: ",
-    and then extracts the action and its arguments.
+    This function takes the LLM output and extracts the action and its parameters.
 
     Args:
         text (str): The LLM output to parse.
 
     Returns:
-        str: The action and its arguments.
+        dict[str, Any]: A dictionary containing the action and its arguments.
     """
-    action_prefix = "Action: "
-    if not text.strip().split("\n")[-1].startswith(action_prefix):
+    lines = text.strip().split("\n")
+    action_line = next((line for line in lines if line.startswith("Action:")), None)
+    params_line = next((line for line in lines if line.startswith("Parameters:")), None)
+
+    if not action_line:
         return {"action": "retry", "args": f"Could not parse LLM Output: {text}"}
-    action_block = text.strip().split("\n")[-1]
-    action_str = action_block[len(action_prefix) :]
-    split_output = action_str.split(" ", 1)
-    if len(split_output) == 1:
-        action, action_input = split_output[0], None
-    else:
-        action, action_input = split_output
-    action = action.strip()
-    if action_input is not None:
-        action_input = [
-            inp.strip().strip("[]") for inp in action_input.strip().split(";")
-        ]
-    return {"action": action, "args": action_input}
+
+    action = action_line.split(":", 1)[1].strip()
+
+    args = {}
+    if params_line:
+        params_str = params_line.split(":", 1)[1].strip()
+        try:
+            args = json.loads(params_str)
+        except json.JSONDecodeError:
+            # Fallback to the original parsing method if JSON parsing fails
+            params_list = params_str.strip("{}").split(",")
+            for param in params_list:
+                key, value = param.split(":", 1)
+                args[key.strip()] = value.strip().strip('"')
+
+    return {"action": action, "args": args}
 
 
 def select_tool(state: AgentState) -> str:
@@ -137,3 +143,50 @@ def convert_tools_to_openai_format(tools: list[Callable]) -> list[dict[str, Any]
         openai_tools.append(tool)
 
     return openai_tools
+
+
+def convert_tools_to_paragraphs(tools: list[Callable]) -> str:
+    """
+    Convert function tools to paragraph format for in-prompt use.
+
+    Args:
+        tools (List[Callable]): A list of tool functions.
+
+    Returns:
+        str: A string containing paragraph descriptions of the tools.
+    """
+    paragraphs = []
+    for func in tools:
+        signature = inspect.signature(func)
+        parameters = list(signature.parameters.values())[1:]  # Skip 'state' parameter
+
+        docstring = inspect.getdoc(func)
+        description, params_doc = (
+            docstring.split("Args:", 1) if "Args:" in docstring else (docstring, "")
+        )
+
+        tool_desc = f"Action: {func.__name__}\n"
+        tool_desc += f"Description: {' '.join(description.strip().split())}\n"
+
+        if parameters:
+            tool_desc += "Parameters: {"
+            param_descriptions = []
+            for param in parameters:
+                param_doc = next(
+                    (
+                        line.strip()
+                        for line in params_doc.split("\n")
+                        if param.name in line
+                    ),
+                    "",
+                )
+                param_description = (
+                    param_doc.split(":", 1)[1].strip() if ":" in param_doc else ""
+                )
+                param_descriptions.append(f'"{param.name}": "{param_description}"')
+            tool_desc += ", ".join(param_descriptions)
+            tool_desc += "}\n"
+
+        paragraphs.append(tool_desc.strip())
+
+    return "\n\n".join(paragraphs)

@@ -1,4 +1,5 @@
 import asyncio
+import traceback
 
 import dotenv
 import typer
@@ -6,6 +7,7 @@ from playwright.async_api import Page, async_playwright
 
 from src.orchestrator.orchestrator import Orchestrator
 from src.orchestrator.prompt import WEB_BROWSING
+from src.orchestrator.tools.response import answer
 from src.orchestrator.tools.web import (
     click,
     go_back,
@@ -34,11 +36,11 @@ async def call_agent(question: str, page: Page, max_steps: int):
         system_prompt=WEB_BROWSING,
         llm="openai/gpt-4o",
         agent_state=agent_state,
-        tools=[click, type_text, scroll, wait, go_back, to_google],
+        tools=[click, type_text, scroll, wait, go_back, to_google, answer],
         max_steps=max_steps,
     )
     orchestrator = Orchestrator(config)
-    orchestrator.run()
+    await orchestrator.run()
 
 
 async def handle_text_input(config: MainConfig, page: Page):
@@ -51,8 +53,9 @@ async def handle_text_input(config: MainConfig, page: Page):
     try:
         final_answer = await call_agent(question, page, config.max_steps)
         logger.info(f"final_answer: {final_answer}")
-    except Exception:
-        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
 
 
 async def start(config: MainConfig):
