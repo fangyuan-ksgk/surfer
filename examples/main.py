@@ -7,7 +7,7 @@ from playwright.async_api import Page, async_playwright
 
 from src.orchestrator.orchestrator import Orchestrator
 from src.orchestrator.prompt import WEB_BROWSING
-from src.orchestrator.tools.response import answer
+from src.orchestrator.tools.response import answer, end
 from src.orchestrator.tools.web import (
     click,
     go_back,
@@ -30,42 +30,43 @@ async def call_agent(question: str, page: Page, max_steps: int):
     agent_state = AgentState(
         page=page,
         input=question,
-        scratchpad=[],
+        scratchpad="",
     )
     config = OrchestratorConfig(
         system_prompt=WEB_BROWSING,
         llm="openai/gpt-4o",
         agent_state=agent_state,
-        tools=[click, type_text, scroll, wait, go_back, to_google, answer],
+        tools=[click, type_text, scroll, wait, go_back, to_google, answer, end],
         max_steps=max_steps,
     )
     orchestrator = Orchestrator(config)
-    await orchestrator.run()
+    final_answer = await orchestrator.run()
+    return final_answer
 
 
-async def handle_text_input(config: MainConfig, page: Page):
-    if config.prompt_file:
-        question = read_file(config.prompt_file)
-    else:
-        # question = typer.prompt("Please enter your question")
-        question = "What is the weather in San Francisco?"
-
+async def handle_text_input(config: MainConfig, page: Page, question: str):
     try:
         final_answer = await call_agent(question, page, config.max_steps)
-        logger.info(f"final_answer: {final_answer}")
+        logger.info(f"Answer: {final_answer}")
     except Exception as e:
         logger.error(f"Error: {e}")
         logger.error(f"Traceback: {traceback.format_exc()}")
 
 
 async def start(config: MainConfig):
+    if config.input_type == "text":
+        if config.prompt_file:
+            question = read_file(config.prompt_file)
+        else:
+            question = typer.prompt("Please enter your question")
+
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=False)
         page = await browser.new_page()
         await page.goto(config.start_url)
 
         if config.input_type == "text":
-            await handle_text_input(config, page)
+            await handle_text_input(config, page, question)
         else:
             raise ValueError(f"Unsupported input type: {config.input_type}")
 

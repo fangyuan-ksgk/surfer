@@ -4,6 +4,7 @@ import base64
 from playwright.async_api import Page
 
 from src.schemas.models import AgentState
+from src.utils.logging import logger
 
 
 async def mark_page(page: Page) -> str:
@@ -41,18 +42,33 @@ async def mark_page(page: Page) -> str:
     }
 
 
-async def annotate(state: AgentState) -> AgentState:
+async def annotate(
+    state: AgentState, max_retries: int = 10, retry_delay: float = 0.5
+) -> AgentState:
     """
     Annotate the page with bounding boxes and take a screenshot.
 
     Args:
         state (AgentState): The current state of the agent, containing the page object.
+        max_retries (int): The maximum number of retries to attempt.
+        retry_delay (float): The delay between retries in seconds.
 
     Returns:
         AgentState: An updated AgentState object with the screenshot and bounding box information.
     """
-    marked_page = await mark_page(state.page)
-    return AgentState(**{**state.__dict__, **marked_page})
+    for attempt in range(max_retries):
+        try:
+            marked_page = await mark_page(state.page)
+            return AgentState(**{**state.__dict__, **marked_page})
+        except Exception as e:
+            if attempt < max_retries - 1:
+                logger.info(
+                    f"Attempt {attempt + 1} failed. Retrying in {retry_delay} seconds..."
+                )
+                await asyncio.sleep(retry_delay)
+            else:
+                logger.info(f"All {max_retries} attempts failed. Last error: {str(e)}")
+                raise
 
 
 def format_descriptions(state: AgentState) -> str:

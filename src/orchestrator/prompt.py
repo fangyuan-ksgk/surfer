@@ -20,6 +20,7 @@ Key Guidelines You MUST follow:
 * Web Browsing Guidelines *
 1) Don't interact with useless web elements like Login, Sign-in, donation that appear in Webpages
 2) Select strategically to minimize time wasted.
+3) If you find yourself in a loop, consider ending the task or changing your approach.
 
 Your reply should strictly follow the format:
 
@@ -28,6 +29,8 @@ Action: {{One Action format you choose}}
 Parameters: {{Parameters for the action}}
 Then the User will provide:
 Observation: {{A labeled screenshot Given by User}}
+
+{scratchpad}
 
 {bounding_boxes}
 

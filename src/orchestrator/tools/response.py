@@ -17,3 +17,17 @@ async def answer(state: AgentState, content: str) -> str:
     """
     _ = state  # Explicitly acknowledge the unused argument
     return f"ANSWER: {content}"
+
+
+async def end(state: AgentState) -> None:
+    """
+    End the agent's execution.
+
+    This function is used when the agent has determined it has sufficient information
+    to provide a final answer to the user's original question.
+
+    Args:
+        state (AgentState): The current state of the agent.
+    """
+    _ = state  # Explicitly acknowledge the unused argument
+    return

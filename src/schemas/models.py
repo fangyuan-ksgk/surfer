@@ -13,7 +13,7 @@ class BBox(TypedDict):
 
 class Prediction(TypedDict):
     action: str
-    args: list[str] | None
+    args: dict | None
 
 
 class BaseMessage(BaseModel):
@@ -33,5 +33,5 @@ class AgentState(BaseModel):
     img: str | None = None
     bboxes: list[BBox] | None = None
     prediction: Prediction | None = None
-    scratchpad: list[BaseMessage] | None = None
+    scratchpad: str = ""
     observation: str | None = None
